@@ -13,4 +13,10 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
-# continue with dependency to get DB session
+# dependency for routes to open and close a DB session
+def get_db():
+  db = SessionLocal()
+  try:
+    yield db
+  finally:
+    db.close()
