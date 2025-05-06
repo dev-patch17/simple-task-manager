@@ -25,3 +25,21 @@ class Task(TaskBase):
     # and access nested relationships
     class Config:
         orm_mode = True
+
+
+# project schemas follow the same organization as task schemas above
+class ProjectBase(BaseModel):
+    title: str
+    notes: Optional[str] = None
+    completed: bool = False
+
+class ProjectCreate(ProjectBase):
+    pass
+
+class Project(ProjectBase):
+    id: int
+    created_at: datetime
+    tasks: List[Task] = []
+
+    class Config:
+        orm_mode = True
