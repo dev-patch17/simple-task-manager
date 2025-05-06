@@ -13,3 +13,18 @@ models.Base.metadata.create_all(bind=engine)
 
 # initialize FastAPI
 app = FastAPI(title='Simple Task Manager')
+
+# set up templates and static files
+templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+# index route
+@app.get('/', response_class=HTMLResponse)
+async def index(request: Request, db: Session = Depends(get_db)):
+    projects = crud.get_projects(db)
+    tasks = crud.get_tasks(db)
+    return templates.TemplateResponse('index.html', {
+        'request': request,
+        'projects': projects,
+        'tasks': tasks
+    })
