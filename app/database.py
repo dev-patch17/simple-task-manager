@@ -7,7 +7,7 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///./simple_task_manager.db"
 # create an SQLAlchemy engine,
 # which is the starting point for any SQLAlchemy application
 engine = create_engine(
-  SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
 # create a factory for creating database sessions
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -17,8 +17,8 @@ Base = declarative_base()
 
 # dependency for routes to open and close a DB session
 def get_db():
-  db = SessionLocal()
-  try:
-    yield db
-  finally:
-    db.close()
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
