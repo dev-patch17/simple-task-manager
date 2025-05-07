@@ -85,9 +85,12 @@ async def create_task(
     request: Request,
     name: str = Form(...),
     notes: Optional[str] = Form(None),
-    project_id: Optional[int] = Form(None),
+    project_id: Optional[str] = Form(None),
     db: Session = Depends(get_db)
 ):
+    # convert empty string to None for project_id
+    project_id = int(project_id) if project_id else None
+    # create task
     task = schemas.TaskCreate(name=name, notes=notes, project_id=project_id)
     crud.create_task(db, task)
     return RedirectResponse(url="/", status_code=303)
