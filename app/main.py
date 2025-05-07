@@ -130,3 +130,22 @@ async def toggle_task(task_id: int, db: Session = Depends(get_db)):
     )
     crud.update_task(db, task_id, task_update)
     return RedirectResponse(url="/", status_code=303)
+
+
+# API endpoints (JSON response)
+@app.get("/api/projects/", response_model=list[schemas.Project])
+def read_projects(skip: int = 0, limit: int = 100,
+                  db: Session = Depends(get_db)):
+    projects = crud.get_projects(db, skip=skip, limit=limit)
+    return projects
+
+@app.get("/api/tasks/", response_model=list[schemas.Task])
+def read_tasks(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    tasks = crud.get_tasks(db, skip=skip, limit=limit)
+    return tasks
+
+
+# allow running of dev server via: python -m app.main
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
