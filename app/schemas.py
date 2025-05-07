@@ -7,7 +7,7 @@ from datetime import datetime
 class TaskBase(BaseModel):
     name: str
     notes: Optional[str] = None
-    completed: bool = False
+    is_completed: bool = False
     project_id: Optional[int] = None
 
 # if we later decide new tasks require additional fields during creation,
@@ -31,7 +31,7 @@ class Task(TaskBase):
 class ProjectBase(BaseModel):
     title: str
     notes: Optional[str] = None
-    completed: bool = False
+    is_completed: bool = False
 
 class ProjectCreate(ProjectBase):
     pass
