@@ -35,10 +35,10 @@ async def index(request: Request, db: Session = Depends(get_db)):
 async def create_project(
     request: Request,
     title: str = Form(...),
-    description: Optional[str] = Form(None),
+    notes: Optional[str] = Form(None),
     db: Session = Depends(get_db)
 ):
-    project = schemas.ProjectCreate(title=title, description=description)
+    project = schemas.ProjectCreate(title=title, notes=notes)
     crud.create_project(db, project)
     return RedirectResponse(url="/", status_code=303)
 
@@ -46,13 +46,13 @@ async def create_project(
 async def update_project(
     project_id: int,
     title: str = Form(...),
-    description: Optional[str] = Form(None),
+    notes: Optional[str] = Form(None),
     is_completed: bool = Form(False),
     db: Session = Depends(get_db)
 ):
     project = schemas.ProjectCreate(
         title=title,
-        description=description,
+        notes=notes,
         is_completed=is_completed
     )
     crud.update_project(db, project_id, project)
@@ -69,11 +69,64 @@ async def toggle_project(project_id: int, db: Session = Depends(get_db)):
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    # Toggle completion status
+    # toggle completion status
     project_update = schemas.ProjectCreate(
         title=project.title,
-        description=project.description,
+        notes=project.notes,
         is_completed=not project.is_completed
     )
     crud.update_project(db, project_id, project_update)
+    return RedirectResponse(url="/", status_code=303)
+
+
+# API routes for tasks
+@app.post("/tasks/")
+async def create_task(
+    request: Request,
+    name: str = Form(...),
+    notes: Optional[str] = Form(None),
+    project_id: Optional[int] = Form(None),
+    db: Session = Depends(get_db)
+):
+    task = schemas.TaskCreate(name=name, notes=notes, project_id=project_id)
+    crud.create_task(db, task)
+    return RedirectResponse(url="/", status_code=303)
+
+@app.post("/tasks/{task_id}/update")
+async def update_task(
+    task_id: int,
+    name: str = Form(...),
+    notes: Optional[str] = Form(None),
+    is_completed: bool = Form(False),
+    project_id: Optional[int] = Form(None),
+    db: Session = Depends(get_db)
+):
+    task = schemas.TaskCreate(
+        name=name,
+        notes=notes,
+        is_completed=is_completed,
+        project_id=project_id
+    )
+    crud.update_task(db, task_id, task)
+    return RedirectResponse(url="/", status_code=303)
+
+@app.get("/tasks/{task_id}/delete")
+async def delete_task(task_id: int, db: Session = Depends(get_db)):
+    crud.delete_task(db, task_id)
+    return RedirectResponse(url="/", status_code=303)
+
+@app.post("/tasks/{task_id}/toggle")
+async def toggle_task(task_id: int, db: Session = Depends(get_db)):
+    task = crud.get_task(db, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    # toggle completion status
+    task_update = schemas.TaskCreate(
+        name=task.name,
+        notes=task.notes,
+        is_completed=not task.is_completed,
+        project_id=task.project_id
+    )
+    crud.update_task(db, task_id, task_update)
     return RedirectResponse(url="/", status_code=303)
