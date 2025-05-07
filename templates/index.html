@@ -1,5 +1,134 @@
 {% extends "base.html" %}
 
 {% block content %}
-<p>Tasks and Projects coming soon...</p>
+<div class="container">
+    <section class="tasks-section">
+        <h2>Tasks</h2>
+        
+        <!-- Create Task Form -->
+        <div class="form-container">
+            <h3>Add New Task</h3>
+            <form action="/tasks/" method="post">
+                <div class="form-group">
+                    <label for="task-name">Name:</label>
+                    <input type="text" id="task-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-notes">Notes:</label>
+                    <textarea id="task-notes" name="notes"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-project">Project (optional):</label>
+                    <select id="task-project" name="project_id">
+                        <option value="">None</option>
+                        {% for project in projects %}
+                        <option value="{{ project.id }}">{{ project.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Add Task</button>
+            </form>
+        </div>
+        
+        <!-- Task List -->
+        <div class="list-container">
+            <h3>Your Tasks</h3>
+            {% if tasks %}
+                <ul class="task-list">
+                    {% for task in tasks %}
+                    <li class="task-item {% if task.is_completed %}completed{% endif %}">
+                        <div class="task-header">
+                            <h4>{{ task.name }}</h4>
+                            <div class="task-actions">
+                                <form action="/tasks/{{ task.id }}/toggle" method="post">
+                                    <button type="submit" class="btn-toggle">
+                                        {% if task.is_completed %}Reopen{% else %}Complete{% endif %}
+                                    </button>
+                                </form>
+                                <a href="/tasks/{{ task.id }}/delete" class="btn-delete" 
+                                   onclick="return confirm('Are you sure you want to delete this task?')">Delete</a>
+                            </div>
+                        </div>
+                        {% if task.notes %}
+                            <p class="task-notes">{{ task.notes }}</p>
+                        {% endif %}
+                        {% if task.project %}
+                            <p class="task-project">Project: {{ task.project.title }}</p>
+                        {% endif %}
+                        <p class="task-date">Created: {{ task.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty-list">No tasks yet.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="projects-section">
+        <h2>Projects</h2>
+        
+        <!-- Create Project Form -->
+        <div class="form-container">
+            <h3>Add New Project</h3>
+            <form action="/projects/" method="post">
+                <div class="form-group">
+                    <label for="project-title">Title:</label>
+                    <input type="text" id="project-title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="project-notes">Notes:</label>
+                    <textarea id="project-notes" name="notes"></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Add Project</button>
+            </form>
+        </div>
+        
+        <!-- Project List -->
+        <div class="list-container">
+            <h3>Your Projects</h3>
+            {% if projects %}
+                <ul class="project-list">
+                    {% for project in projects %}
+                    <li class="project-item {% if project.is_completed %}completed{% endif %}">
+                        <div class="project-header">
+                            <h4>{{ project.title }}</h4>
+                            <div class="project-actions">
+                                <form action="/projects/{{ project.id }}/toggle" method="post">
+                                    <button type="submit" class="btn-toggle">
+                                        {% if project.is_completed %}Reopen{% else %}Complete{% endif %}
+                                    </button>
+                                </form>
+                                <a href="/projects/{{ project.id }}/delete" class="btn-delete" 
+                                   onclick="return confirm('Are you sure you want to delete this project?')">Delete</a>
+                            </div>
+                        </div>
+                        {% if project.notes %}
+                            <p class="project-notes">{{ project.notes }}</p>
+                        {% endif %}
+                        <p class="project-date">Created: {{ project.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                        
+                        <!-- Project Tasks -->
+                        {% if project.tasks %}
+                            <div class="project-tasks">
+                                <h5>Project Tasks:</h5>
+                                <ul>
+                                    {% for task in project.tasks %}
+                                    <li class="{% if task.is_completed %}completed{% endif %}">
+                                        {{ task.name }}
+                                        {% if task.is_completed %}(Completed){% endif %}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty-list">No projects yet.</p>
+            {% endif %}
+        </div>
+    </section>
+</div>
 {% endblock %}
