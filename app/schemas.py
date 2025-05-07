@@ -24,7 +24,7 @@ class Task(TaskBase):
     # allow Pydantic to convert ORM objects to dictionaries
     # and access nested relationships
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # project schemas follow the same organization as task schemas above
@@ -42,4 +42,4 @@ class Project(ProjectBase):
     tasks: List[Task] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
